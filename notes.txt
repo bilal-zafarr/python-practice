@@ -1,0 +1,47 @@
+from lib2to3.pgen2 import driver
+
+
+mongdb notes
+pymongo -> python mongodb driver
+python -m pip install pymongo
+
+import pymongo
+client = pymongo.MongoClient()
+#will create a databse if it doesn't exist
+
+mydb = myclient["mydatabse"]
+#in mongodb database is not created untill it gets content
+
+MongoDB uses collections of documents instead of tables of rows
+
+db -> collection -> document
+
+##insert
+col.insert_one()
+col.insert_many()
+
+_id
+
+#mongodb has globally unique ids
+
+##find
+col.find_one()
+col.find() -> find_All
+
+col.find({},{"_id":0, "name":1})
+
+col.find({"name": "Bilal"})
+
+#sort
+col.find().sort("_id")
+
+col.delete_one({})
+
+col.delete_many({})
+
+col.drop
+
+col.update_one({"name": "Bilal"}, {"$set": {"address": "FSD"}})
+col.update_many({"name": "Bilal"}, {"$set": {"address": "FSD"}})
+
+col.find().limit(5)

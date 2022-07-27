@@ -2,22 +2,25 @@ import random
 import time
 import mysql.connector
 
+#connecting to the sql server (feel free to change the credentials according to your system)
 mydb = mysql.connector.connect(
   host="localhost",
   user="admin",
   password="12345678",
-  #database="advice_seeker"
 )
 
+#creating the database if does not exist
 mycursor = mydb.cursor()
+create_db_if_doesnt_exist = "CREATE DATABASE IF NOT EXISTS adviceseeker"
+mycursor.execute(create_db_if_doesnt_exist)
 
-try:
-    
-    mycursor.execute("CREATE DATABASE adviceseeker")
-except:
+#connecting to the adviceseeker database
+using_adviceseeker = "USE adviceseeker"
+mycursor.execute(using_adviceseeker)
 
-#mycursor.execute("CREATE TABLE IF NOT EXISTS customers (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), address VARCHAR(255))")
-    
+#creating a table if does not exist
+create_table_if_doesnt_exist = "CREATE TABLE IF NOT EXISTS faqs (id INT AUTO_INCREMENT PRIMARY KEY, question VARCHAR(255), answer VARCHAR(255))"
+mycursor.execute(create_table_if_doesnt_exist)
 
 advice = ["If you stare at something you dropped on the ground, eventually someone will pick it up for you.",
 "Never take decisions when you are angry and don’t make promises when you are happy.",
@@ -62,22 +65,47 @@ def main():
         print("\n------------------------------------------------")
         print("\n-> Enter 1 for a friendly advice :)")
         print("-> Enter 2 to ask your questions")
+        print("-> Enter 3 view the previous results")
         print("-> Enter any other key to quit\n")
 
         choice = input("Enter your choice: ")
 
         if choice == "1":
+            question = "Advice"
             print("\nThinking .............\n")
             time.sleep(2)
-            print(random.choice(advice))
+            answer= random.choice(advice)
+            print(answer)
+            #inserting the data into the table
+            sql = "INSERT INTO faqs (question, answer) VALUES (%s, %s)"
+            val = (question, answer)
+            mycursor.execute(sql, val)
+            mydb.commit()
+
         elif choice == "2":
-            input("\nAsk away! Whatever it is, I will try to answer it: ")
+            question = input("\nAsk away! Whatever it is, I will try to answer it: ")
             print("\nThinking .............\n")
             time.sleep(2)
-            print(random.choice(answers))
+            answer= random.choice(answers)
+            print(answer)
+            #inserting the data into the table
+            sql = "INSERT INTO faqs (question, answer) VALUES (%s, %s)"
+            val = (question, answer)
+            mycursor.execute(sql, val)
+            mydb.commit()
+
+        elif choice == "3":
+            mycursor.execute("SELECT * FROM adviceseeker.faqs")
+            myresult = mycursor.fetchall()
+            print("\nQuestion\t\t\t\tAnswer")
+            for x in myresult:
+                print(x[1], "\t\t\t\t", x[2])
+
         else:
             print("Bye bye!")
             break
+
+    mydb.close()
 
 if __name__ == "__main__":
     main()
